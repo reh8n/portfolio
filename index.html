@@ -1,18 +1,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta charset="utf-8">
-<meta name="description" content="Rehan Ali — student founder building Otis OS, a2acompress, BizRevise and PsychRevise. Software and operations, both ends.">
+<meta name="description" content="Rehan Ali, student founder building Otis OS, a2acompress and SaveMyPrinter. Software and operations, both ends.">
 <meta name="author" content="Rehan Ali">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Rehan Ali — Founder &amp; Builder">
-<meta property="og:description" content="I build products, businesses and stories. Otis OS, a2acompress, BizRevise, PsychRevise.">
+<meta property="og:title" content="Rehan Ali, Founder &amp; Builder">
+<meta property="og:description" content="I build products, businesses and stories. Otis OS, a2acompress, SaveMyPrinter.">
 <meta property="og:image" content="https://rehan-ali-labs.org/og.png">
 <meta property="og:url" content="https://rehan-ali-labs.org/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Rehan Ali — Founder &amp; Builder">
+<meta name="twitter:title" content="Rehan Ali, Founder &amp; Builder">
 <meta name="twitter:description" content="I build products, businesses and stories.">
 <meta name="twitter:image" content="https://rehan-ali-labs.org/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101010'/%3E%3Ctext x='16' y='23' font-family='Helvetica,Arial,sans-serif' font-size='19' font-weight='500' fill='%23F2F2F2' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
-<title>Rehan Ali — Founder</title>
+<title>Rehan Ali, Founder</title>
 <style>
   :root {
     --bg: #101010;
@@ -426,6 +426,83 @@
     white-space: nowrap;
   }
 
+  /* carousel */
+  .shots { position: relative; width: 100%; height: 100%; }
+  .shots-track { position: absolute; inset: 0; }
+  .shot {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px 44px;
+    opacity: 0;
+    transition: opacity .5s ease;
+    pointer-events: none;
+  }
+  .shot.on { opacity: 1; pointer-events: auto; }
+  .shot img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--fg-10);
+    box-shadow: 0 20px 50px rgba(0,0,0,.6);
+    display: block;
+  }
+  .shots-cap {
+    position: absolute;
+    left: 0; right: 0; bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    z-index: 3;
+  }
+  .shots-dots { display: flex; gap: 7px; }
+  .shots-dots button {
+    width: 7px; height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--fg-30);
+    cursor: pointer;
+    transition: background .25s ease, transform .25s ease;
+  }
+  .shots-dots button.on { background: var(--fg); transform: scale(1.25); }
+  .shots-label {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--fg-50);
+    min-width: 128px;
+    text-align: center;
+  }
+  .shots-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    border: 1px solid var(--fg-10);
+    border-radius: 50%;
+    background: rgba(12,12,12,.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--fg-80);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .3s ease, color .2s ease, border-color .2s ease;
+    z-index: 4;
+  }
+  .project-card:hover .shots-nav, .shots-nav:focus-visible { opacity: 1; }
+  .shots-nav:hover { color: var(--fg); border-color: var(--fg-30); }
+  .shots-nav.prev { left: 12px; }
+  .shots-nav.next { right: 12px; }
+  .shots-nav svg { width: 13px; height: 13px; }
+
   .book {
     width: 232px; height: 330px;
     border-radius: 4px 10px 10px 4px;
@@ -502,6 +579,12 @@
     .stack-wrap { gap: 40px; }
     .project-card { height: auto; }
     .project-thumbnail { position: relative; inset: auto; height: auto; min-height: 300px; padding: 26px 0; margin-top: 28px; }
+    .project-thumbnail:has(.shots) { min-height: 0; padding: 0; }
+    .shots { height: auto; aspect-ratio: 1.53; }
+    .shot { padding: 12px 14px 38px; }
+    .shots-nav { opacity: 1; width: 26px; height: 26px; }
+    .shots-nav.prev { left: 8px; }
+    .shots-nav.next { right: 8px; }
     .src-row { font-size: 12.5px; padding: 9px 11px; }
     .src-out { flex-wrap: wrap; gap: 8px; }
     .projectcard-top { padding: 24px 24px 0; }
@@ -560,7 +643,7 @@
           <div class="hero-about-grid">
             <div>
               <p class="text-hero-about">Founder of Otis OS. Based in Dubai.</p>
-              <p class="text-hero-about-formerly">Shipping a2acompress, BizRevise and PsychRevise.</p>
+              <p class="text-hero-about-formerly">Also building a2acompress and SaveMyPrinter.</p>
             </div>
           </div>
         </div>
@@ -584,7 +667,7 @@
             <h3 class="text-projectcard-title">Otis OS</h3>
             <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Founder, '26</span> — An operating system for student entrepreneurs: IDE, Business Agent, Personal Agent.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Founder, '26</span>. An operating system for student entrepreneurs: IDE, Business Agent, Personal Agent.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-otis"></div>
@@ -608,7 +691,7 @@
             <h3 class="text-projectcard-title">a2acompress</h3>
             <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Research, '26</span> — Lossless wire format for agent-to-agent handoffs. Byte-exact round trip, decode overhead counted.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Research, '26</span>. Lossless wire format for agent-to-agent handoffs. Byte-exact round trip, decode overhead counted.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-a2a"></div>
@@ -635,7 +718,7 @@
             <h3 class="text-projectcard-title">Market Prediction Corpus</h3>
             <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Data pipeline, '26</span> — Three independent sources joined into one fine-tuning corpus. Rules-first extraction, AI only fills what rules miss, so every field keeps its provenance.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Data pipeline, '26</span>. Three independent sources joined into one fine-tuning corpus. Rules-first extraction, AI only fills what rules miss, so every field keeps its provenance.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-market"></div>
@@ -662,7 +745,7 @@
             <h3 class="text-projectcard-title">GFS Senior Jackets</h3>
             <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">GEMS Founders, '27</span> — Idea to real product to real customers: store, vote, payments, supply chain.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">GEMS Founders, '27</span>. Idea to real product to real customers: store, vote, payments, supply chain.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-jackets"></div>
@@ -680,97 +763,45 @@
         </div>
       </a>
 
-      <a class="project-card rise" href="https://bizrevise.netlify.app/" target="_blank" rel="noopener noreferrer">
+                  <article class="project-card rise">
         <div class="glare"></div>
         <div class="projectcard-top">
           <div class="projectcard-title-row">
-            <h3 class="text-projectcard-title">BizRevise</h3>
-            <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
+            <h3 class="text-projectcard-title">SaveMyPrinter</h3>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">EdTech, '26</span> — Edexcel Business IAL revision, Units 1 &amp; 2, past papers 2021–2025. Offline, streaks, home-screen install.</p>
-        </div>
-        <div class="project-thumbnail">
-          <div class="project-card-colour c-biz"></div>
-          <div class="mock">
-            <div class="panel">
-              <div class="panel-head"><span>Unit 1 · Question 4</span><span>streak 12</span></div>
-              <div class="panel-body">
-                <div class="q-meta"><span class="q-chip">12 marks</span><span class="q-chip">Paper 2023</span><span class="q-chip">Offline</span></div>
-                <p class="q-text">Assess the likely impact of a rise in interest rates on a business planning expansion.</p>
-                <div class="q-answer">Model answer unlocks after you submit yours.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <a class="project-card rise" href="https://psychologyaqa.netlify.app/" target="_blank" rel="noopener noreferrer">
-        <div class="glare"></div>
-        <div class="projectcard-top">
-          <div class="projectcard-title-row">
-            <h3 class="text-projectcard-title">PsychRevise</h3>
-            <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
-          </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">EdTech, '26</span> — AQA A Level Psychology, 280+ exam-style questions with mark schemes, hints and proficiency tracking.</p>
-        </div>
-        <div class="project-thumbnail">
-          <div class="project-card-colour c-psych"></div>
-          <div class="mock">
-            <div class="panel">
-              <div class="panel-head"><span>Proficiency</span><span>280+ questions</span></div>
-              <div class="panel-body">
-                <div class="prof">
-                  <div class="prof-row">Social influence<div class="prof-track"><div class="prof-fill" style="width:86%"></div></div><b>86</b></div>
-                  <div class="prof-row">Memory<div class="prof-track"><div class="prof-fill" style="width:72%"></div></div><b>72</b></div>
-                  <div class="prof-row">Attachment<div class="prof-track"><div class="prof-fill" style="width:64%"></div></div><b>64</b></div>
-                  <div class="prof-row">Psychopathology<div class="prof-track"><div class="prof-fill" style="width:58%"></div></div><b>58</b></div>
-                  <div class="prof-row">Research methods<div class="prof-track"><div class="prof-fill" style="width:41%"></div></div><b>41</b></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <article class="project-card rise">
-        <div class="glare"></div>
-        <div class="projectcard-top">
-          <div class="projectcard-title-row">
-            <h3 class="text-projectcard-title">AI Printer Repair</h3>
-            <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
-          </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">AI tool, '26</span> — Turns cryptic printer errors into guided steps a normal person can follow.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">macOS app, '26</span>. Finds what is stopping a Mac printing, explains it in plain English, and shows the exact command before changing anything.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-printer"></div>
-          <div class="mock">
-            <div class="panel">
-              <div class="panel-head"><span>Diagnosis</span><span>guided fix</span></div>
-              <div class="panel-body">
-                <div class="diag">
-                  <span class="code">ERROR 0x0000709</span>
-                  <span class="to">becomes</span>
-                  <span class="fix">Printer is offline on the network.</span>
-                </div>
-                <ol class="steps">
-                  <li><span>1</span>Check the printer and laptop share a Wi-Fi network.</li>
-                  <li><span>2</span>Clear the stuck job from the print queue.</li>
-                  <li><span>3</span>Re-add the printer by IP, not by name.</li>
-                </ol>
-              </div>
+          <div class="shots" data-carousel>
+            <div class="shots-track">
+              <figure class="shot on"><img src="img/printer-1.webp" width="1600" height="865" alt="SaveMyPrinter start screen, listing every category of printing fault it checks" loading="lazy" decoding="async"></figure>
+              <figure class="shot"><img src="img/printer-2.webp" width="1600" height="865" alt="Problems tab showing a disconnected printer, a wrong driver warning, and earlier logged failures" loading="lazy" decoding="async"></figure>
+              <figure class="shot"><img src="img/printer-3.webp" width="1600" height="865" alt="Printers tab showing queue controls, default settings and the USB connection string" loading="lazy" decoding="async"></figure>
+              <figure class="shot"><img src="img/printer-4.webp" width="1600" height="865" alt="Ask tab offering a second opinion from Claude using your own API key" loading="lazy" decoding="async"></figure>
+            </div>
+            <button class="shots-nav prev" type="button" aria-label="Previous screenshot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+            </button>
+            <button class="shots-nav next" type="button" aria-label="Next screenshot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+            </button>
+            <div class="shots-cap">
+              <div class="shots-label" aria-live="polite">What it checks</div>
+              <div class="shots-dots" role="tablist" aria-label="Screenshots"></div>
             </div>
           </div>
         </div>
       </article>
 
-      <article class="project-card rise">
+      <a class="project-card rise" href="https://www.amazon.ie/Memory-Architect-Rehan-Muhammad-Ali/dp/B0FKHJH59W" target="_blank" rel="noopener noreferrer">
         <div class="glare"></div>
         <div class="projectcard-top">
           <div class="projectcard-title-row">
             <h3 class="text-projectcard-title">The Memory Architect</h3>
             <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Amazon KDP</span> — A novel, written and published. Same instinct as the software: finish it, ship it.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Amazon KDP</span>. A novel, written and published. Same instinct as the software: finish it, ship it.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-novel"></div>
@@ -781,7 +812,7 @@
             </div>
           </div>
         </div>
-      </article>
+      </a>
 
     </div>
   </section>
@@ -794,11 +825,11 @@
         <div class="glare"></div>
         <h3>Record</h3>
         <div class="record-row"><span class="yr">2027–28</span><span>Logistics Director (Elect), Youth Entrepreneur Society</span><span class="tg">Leadership</span></div>
-        <div class="record-row"><span class="yr">2026</span><span>COP30 — Honorary Mention</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">2024</span><span>CISMUN — Runner-up Best Delegate</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">2024</span><span>CISMUN — Delegate</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">2024</span><span>GFSMUN — Delegate</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">Ongoing</span><span>Client website work — static builds through SEO, animation and 3D</span><span class="tg">Freelance</span></div>
+        <div class="record-row"><span class="yr">2026</span><span>COP30, Honorary Mention</span><span class="tg">MUN</span></div>
+        <div class="record-row"><span class="yr">2024</span><span>CISMUN, Runner-up Best Delegate</span><span class="tg">MUN</span></div>
+        <div class="record-row"><span class="yr">2024</span><span>CISMUN, Delegate</span><span class="tg">MUN</span></div>
+        <div class="record-row"><span class="yr">2024</span><span>GFSMUN, Delegate</span><span class="tg">MUN</span></div>
+        <div class="record-row"><span class="yr">Ongoing</span><span>Client website work, from static builds to SEO, animation and 3D</span><span class="tg">Freelance</span></div>
       </div>
 
       <div class="info-card rise">
@@ -828,7 +859,7 @@
         <div class="glare"></div>
         <h3>Off screen</h3>
         <div class="off">
-          <div><h4>Guitar</h4><p>Acoustic and electric — fingerpicking now, working toward solos.</p></div>
+          <div><h4>Guitar</h4><p>Acoustic and electric. Fingerpicking now, working toward solos.</p></div>
           <div><h4>Basketball</h4><p>Training with a specific target: dunking.</p></div>
           <div><h4>Boxing</h4><p>Second sport, different kind of discipline.</p></div>
           <div><h4>Strength</h4><p>Consistent lifting, tracked, aimed at named numbers.</p></div>
@@ -868,6 +899,49 @@
       }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
       rises.forEach(function (el) { io.observe(el); });
     }
+
+    // screenshot carousels
+    document.querySelectorAll('[data-carousel]').forEach(function (box) {
+      var slides = [].slice.call(box.querySelectorAll('.shot'));
+      var dotsWrap = box.querySelector('.shots-dots');
+      var label = box.querySelector('.shots-label');
+      var labels = ['What it checks', 'Problems found', 'Printer detail', 'Ask Claude'];
+      var i = 0, timer = null;
+
+      var dots = slides.map(function (_, n) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('role', 'tab');
+        b.setAttribute('aria-label', 'Screenshot ' + (n + 1));
+        b.addEventListener('click', function (e) { e.preventDefault(); go(n); rest(); });
+        dotsWrap.appendChild(b);
+        return b;
+      });
+
+      function go(n) {
+        i = (n + slides.length) % slides.length;
+        slides.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+        dots.forEach(function (d, k) {
+          d.classList.toggle('on', k === i);
+          d.setAttribute('aria-selected', k === i ? 'true' : 'false');
+        });
+        if (label && labels[i]) label.textContent = labels[i];
+      }
+
+      function rest() {
+        if (reduce) return;
+        clearInterval(timer);
+        timer = setInterval(function () { go(i + 1); }, 5200);
+      }
+
+      box.querySelector('.shots-nav.prev').addEventListener('click', function (e) { e.preventDefault(); go(i - 1); rest(); });
+      box.querySelector('.shots-nav.next').addEventListener('click', function (e) { e.preventDefault(); go(i + 1); rest(); });
+      box.addEventListener('mouseenter', function () { clearInterval(timer); });
+      box.addEventListener('mouseleave', rest);
+
+      go(0);
+      rest();
+    });
 
     var pill = document.getElementById('pill');
     var glow = document.getElementById('glow');
