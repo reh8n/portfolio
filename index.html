@@ -433,6 +433,7 @@
     position: absolute;
     inset: 0;
     margin: 0;
+    container-type: size;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -443,10 +444,13 @@
   }
   .shot.on { opacity: 1; pointer-events: auto; }
   .shot img {
+    /* Sized from the frame, not the file, so a slide holds its place
+       before the image has loaded. Every screenshot is 1600x865. */
+    width: min(100%, calc(100cqh * 1600 / 865));
+    height: auto;
+    aspect-ratio: 1600 / 865;
     max-width: 100%;
     max-height: 100%;
-    width: auto;
-    height: auto;
     border-radius: 8px;
     border: 1px solid var(--fg-10);
     box-shadow: 0 20px 50px rgba(0,0,0,.6);
@@ -535,6 +539,33 @@
   .record-row .yr { font-size: 13px; color: var(--fg-50); font-variant-numeric: tabular-nums; }
   .record-row .tg { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-30); }
 
+  .role { padding: 18px 0; border-top: 1px solid var(--fg-10); }
+  .role:first-of-type { padding-top: 0; border-top: 0; }
+  .role-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .role h4 { margin: 0; font-size: 17px; font-weight: 500; letter-spacing: -.1px; }
+  .role-when {
+    font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--fg-30); white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .role-org { margin: 3px 0 0; font-size: 13px; letter-spacing: .04em; color: var(--fg-50); }
+  .role-note { margin: 10px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--fg-80); max-width: 68ch; }
+
+  .mun-lead { margin: 0 0 20px; font-size: 16px; color: var(--fg-80); }
+  .mun-grid { display: grid; gap: 1px; background: var(--fg-10); border: 1px solid var(--fg-10); border-radius: 10px; overflow: hidden; }
+  .mun-item {
+    display: grid;
+    grid-template-columns: 58px 1fr auto;
+    gap: 14px;
+    align-items: baseline;
+    padding: 12px 14px;
+    background: #141A18;
+    font-size: 14.5px;
+  }
+  .mun-item b { font-weight: 500; }
+  .mun-yr { font-size: 12px; color: var(--fg-30); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+  .mun-item span:last-child { font-size: 12.5px; color: var(--fg-50); text-align: right; }
+  .mun-rest { margin: 16px 0 0; font-size: 14px; line-height: 1.55; color: var(--fg-50); }
+
   .kit { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 24px 32px; }
   .kit h4 { margin: 0 0 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-50); }
   .kit ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
@@ -590,6 +621,9 @@
     .projectcard-top { padding: 24px 24px 0; }
     .mock { width: 88%; }
     .record-row { grid-template-columns: 76px 1fr; }
+    .role-head { flex-direction: column; gap: 2px; }
+    .mun-item { grid-template-columns: 52px 1fr; row-gap: 2px; }
+    .mun-item span:last-child { grid-column: 2; text-align: left; }
     .record-row .tg { grid-column: 2; }
     .info-card { padding: 24px 20px; }
     .section-info { padding-top: 88px; }
@@ -718,21 +752,26 @@
             <h3 class="text-projectcard-title">Market Prediction Corpus</h3>
             <svg class="icon-projectcard-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 18 18 6M8.5 6H18v9.5"/></svg>
           </div>
-          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Data pipeline, '26</span>. Three independent sources joined into one fine-tuning corpus. Rules-first extraction, AI only fills what rules miss, so every field keeps its provenance.</p>
+          <p class="text-projectcard-description"><span class="text-projectcard-description-company">Data pipeline, '26</span>. Three independent sources joined into one fine-tuning corpus. Rules first, a model only fills the gaps, so every field keeps its provenance.</p>
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-market"></div>
-          <div class="mock">
-            <div class="panel">
-              <div class="panel-head"><span>Sources</span><span>FastAPI · React</span></div>
-              <div class="panel-body">
-                <div class="src">
-                  <div class="src-row">Failed-startup post-mortems, cause stated by the source<b>536 → 531</b></div>
-                  <div class="src-row">YouTube transcripts, auto-discovered and screened<b>16 → 3</b></div>
-                  <div class="src-row">SEC filings matched to price history<b>measured return</b></div>
-                </div>
-                <div class="src-out"><code>corpus.jsonl</code>one training example per line</div>
-              </div>
+          <div class="shots" data-carousel data-labels="Business collector|Collected sources|Training corpus|Ask the dataset">
+            <div class="shots-track">
+              <figure class="shot on"><img src="img/corpus-1.webp" width="1600" height="865" fetchpriority="low" alt="Business Collector screen listing thirty failed companies with the amount raised, year closed and whether a cause was stated" decoding="async"></figure>
+              <figure class="shot"><img src="img/corpus-2.webp" width="1600" height="865" alt="Research Dataset screen showing collected YouTube and SEC EDGAR sources with pipeline metrics" loading="lazy" decoding="async"></figure>
+              <figure class="shot"><img src="img/corpus-3.webp" width="1600" height="865" alt="Model Training Data screen showing corpus example types and one rendered training example" loading="lazy" decoding="async"></figure>
+              <figure class="shot"><img src="img/corpus-4.webp" width="1600" height="865" alt="Data Analyst screen where questions are answered by reading the live dataset" loading="lazy" decoding="async"></figure>
+            </div>
+            <button class="shots-nav prev" type="button" aria-label="Previous screenshot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+            </button>
+            <button class="shots-nav next" type="button" aria-label="Next screenshot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+            </button>
+            <div class="shots-cap">
+              <div class="shots-label" aria-live="polite">Business collector</div>
+              <div class="shots-dots" role="tablist" aria-label="Screenshots"></div>
             </div>
           </div>
         </div>
@@ -773,9 +812,9 @@
         </div>
         <div class="project-thumbnail">
           <div class="project-card-colour c-printer"></div>
-          <div class="shots" data-carousel>
+          <div class="shots" data-carousel data-labels="What it checks|Problems found|Printer detail|Ask Claude">
             <div class="shots-track">
-              <figure class="shot on"><img src="img/printer-1.webp" width="1600" height="865" alt="SaveMyPrinter start screen, listing every category of printing fault it checks" loading="lazy" decoding="async"></figure>
+              <figure class="shot on"><img src="img/printer-1.webp" width="1600" height="865" fetchpriority="low" alt="SaveMyPrinter start screen, listing every category of printing fault it checks" decoding="async"></figure>
               <figure class="shot"><img src="img/printer-2.webp" width="1600" height="865" alt="Problems tab showing a disconnected printer, a wrong driver warning, and earlier logged failures" loading="lazy" decoding="async"></figure>
               <figure class="shot"><img src="img/printer-3.webp" width="1600" height="865" alt="Printers tab showing queue controls, default settings and the USB connection string" loading="lazy" decoding="async"></figure>
               <figure class="shot"><img src="img/printer-4.webp" width="1600" height="865" alt="Ask tab offering a second opinion from Claude using your own API key" loading="lazy" decoding="async"></figure>
@@ -823,13 +862,69 @@
 
       <div class="info-card rise">
         <div class="glare"></div>
-        <h3>Record</h3>
-        <div class="record-row"><span class="yr">2027–28</span><span>Logistics Director (Elect), Youth Entrepreneur Society</span><span class="tg">Leadership</span></div>
-        <div class="record-row"><span class="yr">2026</span><span>COP30, Honorary Mention</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">2024</span><span>CISMUN, Runner-up Best Delegate</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">2024</span><span>CISMUN, Delegate</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">2024</span><span>GFSMUN, Delegate</span><span class="tg">MUN</span></div>
-        <div class="record-row"><span class="yr">Ongoing</span><span>Client website work, from static builds to SEO, animation and 3D</span><span class="tg">Freelance</span></div>
+        <h3>Experience</h3>
+        <div class="role">
+          <div class="role-head">
+            <h4>Head of Logistics</h4>
+            <span class="role-when">Sep 2026 to present</span>
+          </div>
+          <p class="role-org">Youth Entrepreneur Society, Dubai</p>
+          <p class="role-note">Elected Logistics Director for 2027 to 2028. Plan logistics and operations for society events, coordinate resources and timelines, and work with the executive team to turn plans into events that actually run.</p>
+        </div>
+        <div class="role">
+          <div class="role-head">
+            <h4>Senior Jacket Provider</h4>
+            <span class="role-when">Jun 2026 to present</span>
+          </div>
+          <p class="role-org">GFS Class of 2027, Dubai</p>
+          <p class="role-note">Founded and ran the school-approved initiative end to end: budgeting and pricing, payment collection, legal research and contract drafting for approval, manufacturer sourcing, negotiation and factory visits, plus the voting, ordering and fulfilment process. Built and ran the site front and back end. Branding and social reached over 70,000 organic views.</p>
+        </div>
+        <div class="role">
+          <div class="role-head">
+            <h4>Sports Leader, Level 3</h4>
+            <span class="role-when">Sep 2025 to present</span>
+          </div>
+          <p class="role-org">GEMS Founders School, Dubai</p>
+          <p class="role-note">Support PE sessions, spot and remove hazards, and plan and run events such as sports days. Mentor younger students on teamwork and confidence.</p>
+        </div>
+        <div class="role">
+          <div class="role-head">
+            <h4>Intern</h4>
+            <span class="role-when">Jul to Aug 2025</span>
+          </div>
+          <p class="role-org">BEUMER Group, Dubai</p>
+          <p class="role-note">Data management and analysis. Built product pricing tables on ratio-based calculations and RACI matrices mapping roles to responsibilities, with exposure to customer support operations.</p>
+        </div>
+        <div class="role">
+          <div class="role-head">
+            <h4>Author</h4>
+            <span class="role-when">Jun 2023 to Oct 2024</span>
+          </div>
+          <p class="role-org">Self-employed, Dubai</p>
+          <p class="role-note">Wrote and published The Memory Architect, carrying it from first concept through to a finished book on Amazon.</p>
+        </div>
+        <div class="role">
+          <div class="role-head">
+            <h4>Also</h4>
+            <span class="role-when">2023 to 2026</span>
+          </div>
+          <p class="role-org">Shorter engagements</p>
+          <p class="role-note">Represented the UAE in basketball at the Gulf Arts and Sports Festival with Global Encounters, 2025. Featured in a promotional reel for Hushh Dxb, 2026. Organised an event for Foundation Stage students at Cambridge International School Dubai, 2023. Placed 5th of 40 teams in AeroQuest at the American University of Sharjah, 2023. Client website work is ongoing, from static builds to SEO, animation and 3D.</p>
+        </div>
+      </div>
+
+      <div class="info-card rise">
+        <div class="glare"></div>
+        <h3>Model UN and debate</h3>
+        <p class="mun-lead">Ten conferences since 2020, on both sides of the placard.</p>
+        <div class="mun-grid">
+          <div class="mun-item"><span class="mun-yr">2026</span><b>Co-Chair, UNODC</b><span>CISMUN</span></div>
+          <div class="mun-item"><span class="mun-yr">2026</span><b>Honorary Mention</b><span>COP30</span></div>
+          <div class="mun-item"><span class="mun-yr">2025</span><b>Runner-up Best Delegate</b><span>CISMUN, HSC Advanced</span></div>
+          <div class="mun-item"><span class="mun-yr">2020</span><b>Best Delegate</b><span>Best Debate Team</span></div>
+          <div class="mun-item"><span class="mun-yr">2020</span><b>Runner-up Best Delegate</b><span>UNHCR Senior</span></div>
+        </div>
+        <p class="mun-rest">Delegate at CISMUN 2024, CISMUN Internal 2024 and 2025, GFSMUN 2024, and CLC 2024 and 2025.</p>
       </div>
 
       <div class="info-card rise">
@@ -905,7 +1000,7 @@
       var slides = [].slice.call(box.querySelectorAll('.shot'));
       var dotsWrap = box.querySelector('.shots-dots');
       var label = box.querySelector('.shots-label');
-      var labels = ['What it checks', 'Problems found', 'Printer detail', 'Ask Claude'];
+      var labels = (box.dataset.labels || '').split('|');
       var i = 0, timer = null;
 
       var dots = slides.map(function (_, n) {
@@ -913,7 +1008,7 @@
         b.type = 'button';
         b.setAttribute('role', 'tab');
         b.setAttribute('aria-label', 'Screenshot ' + (n + 1));
-        b.addEventListener('click', function (e) { e.preventDefault(); go(n); rest(); });
+        b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); go(n); rest(); });
         dotsWrap.appendChild(b);
         return b;
       });
@@ -934,8 +1029,11 @@
         timer = setInterval(function () { go(i + 1); }, 5200);
       }
 
-      box.querySelector('.shots-nav.prev').addEventListener('click', function (e) { e.preventDefault(); go(i - 1); rest(); });
-      box.querySelector('.shots-nav.next').addEventListener('click', function (e) { e.preventDefault(); go(i + 1); rest(); });
+      function guard(fn) {
+        return function (e) { e.preventDefault(); e.stopPropagation(); fn(); rest(); };
+      }
+      box.querySelector('.shots-nav.prev').addEventListener('click', guard(function () { go(i - 1); }));
+      box.querySelector('.shots-nav.next').addEventListener('click', guard(function () { go(i + 1); }));
       box.addEventListener('mouseenter', function () { clearInterval(timer); });
       box.addEventListener('mouseleave', rest);
 
