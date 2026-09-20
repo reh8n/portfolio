@@ -1,0 +1,504 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="description" content="Prospector finds local businesses with a missing or broken website, verifies what is actually wrong, and drafts a message quoting only what it checked. Open source, MIT.">
+<meta name="author" content="Rehan Ali">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prospector, by Rehan Ali">
+<meta property="og:description" content="Finds local businesses with no website, or one I can prove is broken.">
+<meta property="og:image" content="https://rehan-ali-labs.org/img/prospector/hero.webp">
+<meta property="og:url" content="https://rehan-ali-labs.org/prospector.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Prospector, by Rehan Ali">
+<meta name="twitter:description" content="Finds local businesses with no website, or one I can prove is broken.">
+<meta name="twitter:image" content="https://rehan-ali-labs.org/img/prospector/hero.webp">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101010'/%3E%3Ctext x='16' y='23' font-family='Helvetica,Arial,sans-serif' font-size='19' font-weight='500' fill='%23F2F2F2' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E">
+<title>Prospector</title>
+<style>
+  /* Tokens and shared components are copied from index.html so each page
+     stays self-contained. Change a token here and change it there too. */
+  :root {
+    --bg: #101010;
+    --fg: #F2F2F2;
+    --fg-80: rgba(242,242,242,.8);
+    --fg-50: rgba(242,242,242,.5);
+    --fg-30: rgba(242,242,242,.3);
+    --fg-10: rgba(242,242,242,.1);
+    --fg-05: rgba(242,242,242,.05);
+    --line: #3D3D3D;
+    --card: linear-gradient(190deg, #252525, #101010);
+    --sans: "Neue Montreal", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --serif: Gloock, "Bodoni 72", Didot, "Playfair Display", Georgia, serif;
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: var(--grain);
+    opacity: .035;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    z-index: 200;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 1px solid var(--fg-50); outline-offset: 4px; border-radius: 4px; }
+
+  /* ============ nav ============ */
+  .nav-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 120;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 24px 32px;
+    gap: 16px;
+  }
+  /* This page is long-form prose, so it scrolls under the fixed bar.
+     A scrim keeps the bar readable without changing its look. */
+  .nav-bar::before {
+    content: "";
+    position: absolute;
+    inset: -1px 0 -28px;
+    z-index: -1;
+    background: linear-gradient(var(--bg) 42%, rgba(16,16,16,.86) 68%, rgba(16,16,16,0));
+    pointer-events: none;
+  }
+  .logo-text { font-size: 20px; font-weight: 500; line-height: 20px; letter-spacing: -.2px; }
+  .text-underlogo { font-size: 12px; line-height: 12px; color: var(--fg-50); margin-top: 8px; }
+
+  .back-pill {
+    justify-self: center;
+    display: flex; align-items: center; gap: 9px;
+    height: 48px; padding: 0 20px;
+    border-radius: 24px;
+    border: 1px solid var(--fg-10);
+    background: var(--fg-05);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+    font-size: 14px;
+    color: var(--fg-50);
+    transition: color .28s ease;
+  }
+  .back-pill:hover { color: var(--fg); }
+  .back-pill svg { width: 13px; height: 13px; }
+
+  .chip-socials-wrapper { justify-self: end; display: flex; gap: 4px; }
+  .chip {
+    display: flex; align-items: center; gap: 6px;
+    height: 48px; padding: 0 14px;
+    font-size: 14px; color: var(--fg-80);
+    border-radius: 24px;
+    transition: color .2s ease, background .2s ease;
+  }
+  .chip:hover { color: var(--fg); background: var(--fg-05); }
+  .chip svg { width: 12px; height: 12px; opacity: .6; }
+
+  /* ============ layout ============ */
+  .wrap { max-width: 866px; margin: 0 auto; padding: 0 32px; }
+
+  .section-hero { position: relative; padding: 148px 0 0; }
+  .hero-bg-gradient {
+    position: absolute;
+    top: 0; left: 50%;
+    width: min(1100px, 96vw); height: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(to right, transparent 5%, var(--fg) 50%, transparent 95%);
+    opacity: .35;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--fg-50);
+    margin: 0 0 18px;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(42px, 8vw, 84px);
+    line-height: .92;
+    letter-spacing: -.03em;
+    font-weight: 500;
+    text-wrap: balance;
+  }
+  .tagline {
+    margin: 20px 0 0;
+    font-size: clamp(17px, 2.2vw, 22px);
+    line-height: 1.45;
+    color: var(--fg-80);
+    max-width: 30ch;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 30px 0 0; padding: 0; list-style: none; }
+  .tags li {
+    font-size: 12.5px;
+    color: var(--fg-80);
+    border: 1px solid var(--fg-10);
+    background: var(--fg-05);
+    border-radius: 100px;
+    padding: 5px 12px;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    margin-top: 30px;
+    height: 46px; padding: 0 20px;
+    border-radius: 23px;
+    border: 1px solid var(--fg-30);
+    background: var(--fg-05);
+    font-size: 14.5px;
+    color: var(--fg);
+    transition: background .22s ease, border-color .22s ease, transform .22s ease;
+  }
+  .btn:hover { background: rgba(242,242,242,.12); border-color: var(--fg-50); transform: translateY(-1px); }
+  .btn svg { width: 13px; height: 13px; }
+
+  .hero-figure { margin: 52px 0 0; }
+  .frame {
+    position: relative;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background-image: var(--card);
+    overflow: hidden;
+  }
+  .frame::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent 20%, #fff 50%, transparent 80%);
+    opacity: .5;
+  }
+  .frame img { display: block; width: 100%; height: auto; }
+
+  /* ============ prose ============ */
+  section { padding: 84px 0 0; scroll-margin-top: 104px; }
+  h2 {
+    margin: 0 0 22px;
+    font-size: 13px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--fg-50);
+    font-weight: 400;
+    display: flex; align-items: center; gap: 14px;
+  }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--fg-10); }
+
+  p { margin: 0 0 18px; font-size: 16.5px; line-height: 1.65; color: var(--fg-80); max-width: 68ch; }
+  p:last-child { margin-bottom: 0; }
+  p strong { color: var(--fg); font-weight: 500; }
+  .lede { font-size: 19px; line-height: 1.55; color: var(--fg); }
+
+  /* ============ steps ============ */
+  .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 18px;
+    padding: 20px 0;
+    border-top: 1px solid var(--fg-10);
+  }
+  .steps li:first-child { border-top: 0; padding-top: 0; }
+  .steps li::before {
+    content: counter(step);
+    display: grid; place-items: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--fg-10);
+    background: var(--fg-05);
+    font-size: 12.5px;
+    color: var(--fg-50);
+    font-variant-numeric: tabular-nums;
+  }
+  .steps h3 { margin: 4px 0 6px; font-size: 17px; font-weight: 500; letter-spacing: -.1px; }
+  .steps p { margin: 0; font-size: 15.5px; }
+
+  /* ============ decisions ============ */
+  .decisions { display: grid; gap: 16px; }
+  .decision {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background-image: var(--card);
+    padding: 26px 28px;
+    overflow: hidden;
+  }
+  .decision::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent 20%, #fff 50%, transparent 80%);
+    opacity: .4;
+  }
+  .decision h3 { margin: 0 0 10px; font-size: 18px; font-weight: 500; letter-spacing: -.1px; }
+  .decision p { font-size: 15.5px; margin: 0; }
+
+  /* ============ gallery ============ */
+  .gallery { display: grid; gap: 40px; }
+  figure { margin: 0; }
+  figcaption {
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--fg-50);
+    line-height: 1.5;
+  }
+  .disclosure {
+    margin-top: 32px;
+    font-size: 13px;
+    /* fg-50 clears 4.5:1 on this ground; fg-30 sits at 2.5:1 and this
+       disclosure has to stay readable. */
+    color: var(--fg-50);
+    line-height: 1.5;
+  }
+
+  /* ============ closing ============ */
+  .closing {
+    margin-top: 40px;
+    border-top: 1px solid var(--fg-10);
+    padding-top: 40px;
+  }
+  .closing p { font-size: 20px; color: var(--fg); margin-bottom: 0; }
+
+  /* ============ footer ============ */
+  .section-footer { margin-top: 110px; padding: 56px 0 40px; border-top: 1px solid var(--fg-10); }
+  .footer-inner { display: flex; flex-wrap: wrap; gap: 48px 96px; }
+  .foot-col h4 { margin: 0 0 14px; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--fg-30); font-weight: 400; }
+  .foot-col ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .foot-col a { font-size: 15px; color: var(--fg-80); }
+  .foot-col a:hover { color: var(--fg); }
+  .footer-fine { margin: 64px 0 0; font-size: 13px; color: var(--fg-30); line-height: 1.7; }
+
+  /* ============ motion ============ */
+  .rise { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+  .rise.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .rise { opacity: 1; transform: none; transition: none; }
+    .btn:hover { transform: none; }
+  }
+
+  /* ============ responsive ============ */
+  @media (max-width: 860px) {
+    .nav-bar { grid-template-columns: 1fr auto; padding: 18px 20px; }
+    .chip-socials-wrapper { display: none; }
+    .wrap { padding: 0 20px; }
+    .section-hero { padding-top: 116px; }
+    section { padding-top: 60px; }
+    .hero-figure { margin-top: 36px; }
+    .gallery { gap: 30px; }
+    .decision { padding: 22px 20px; }
+    .steps li { grid-template-columns: 34px 1fr; gap: 14px; }
+    .steps li::before { width: 26px; height: 26px; font-size: 11.5px; }
+    .section-footer { margin-top: 76px; }
+  }
+</style>
+
+<header class="nav-bar">
+  <div class="logo-block">
+    <a href="index.html">
+      <div class="logo-text">Rehan Ali</div>
+      <div class="text-underlogo">Founder &amp; Builder</div>
+    </a>
+  </div>
+
+  <a class="back-pill" href="index.html#work">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H6M11.5 5.5 5 12l6.5 6.5"/></svg>
+    All work
+  </a>
+
+  <div class="chip-socials-wrapper">
+    <a class="chip" href="https://github.com/reh8n/prospector" target="_blank" rel="noopener noreferrer">Repo
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg>
+    </a>
+    <a class="chip" href="https://github.com/reh8n" target="_blank" rel="noopener noreferrer">GitHub
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg>
+    </a>
+  </div>
+</header>
+
+<main>
+  <section class="section-hero">
+    <div class="hero-bg-gradient"></div>
+    <div class="wrap">
+      <p class="eyebrow">Open source · MIT</p>
+      <h1>Prospector</h1>
+      <p class="tagline">Finds local businesses with no website, or one I can prove is broken.</p>
+      <ul class="tags">
+        <li>Python</li><li>SQLite</li><li>Playwright</li><li>Google Places API</li>
+        <li>libphonenumber</li><li>OpenAI and Anthropic APIs</li><li>Go</li><li>HTML, CSS, JS</li>
+      </ul>
+      <a class="btn" href="https://github.com/reh8n/prospector" target="_blank" rel="noopener noreferrer">
+        View on GitHub
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg>
+      </a>
+
+      <figure class="hero-figure">
+        <div class="frame">
+          <img src="img/prospector/hero.webp" width="1600" height="1000" alt="Prospector, an open source tool that finds local businesses with a missing or broken website" fetchpriority="high" decoding="async">
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap rise">
+    <h2>The problem</h2>
+    <p class="lede">I build websites for small local businesses: one person, small jobs, no agency. Finding the ones that actually need a site meant scrolling Google Maps and opening link after link on my phone, and most of what I found was fine.</p>
+    <p>I wanted a search that produced evidence. Not "this business might need a website", but "this site has no mobile layout, here is the check that proved it". If I tell someone their site is broken and it isn't, I have lost the job in one sentence.</p>
+  </section>
+
+  <section class="wrap rise">
+    <h2>What I built</h2>
+    <p>An open-source tool that searches Google for local businesses, loads each website to check whether it is missing or genuinely broken, and drafts a short message quoting only what it verified. It runs entirely on my own machine: a Python command-line tool, a local web interface, and a double-click Mac launcher. SQLite stores every lead, so nothing is ever found, drafted or messaged twice.</p>
+    <p><strong>One rule runs through all of it: a message may only mention something the tool checked itself.</strong></p>
+  </section>
+
+  <section class="wrap rise">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <div>
+          <h3>Find</h3>
+          <p>Pulls business listings from Google.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Audit</h3>
+          <p>Loads each site normally and again in a phone-sized browser, scoring what is wrong: dead site, expired SSL, no mobile layout, http instead of https, very slow load, a parked "coming soon" page. No website at all is the strongest lead.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Draft</h3>
+          <p>One AI call per business, given only the verified facts. Drafts are rejected automatically if they contain [placeholders] or agency-speak.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Send</h3>
+          <p>A WhatsApp queue where each message is pre-typed and I send them by hand, one at a time. Nothing sends itself.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="wrap rise">
+    <h2>Decisions that mattered</h2>
+    <div class="decisions">
+      <div class="decision">
+        <h3>Check before you claim</h3>
+        <p>A valid certificate was once reported broken because Python's certificate list was older than the operating system's. A site behind Cloudflare blocked my checker while loading fine for real people. That case is now marked "inconclusive" rather than "broken". The audit is allowed to say it does not know.</p>
+      </div>
+      <div class="decision">
+        <h3>One wrong number is a stranger's phone</h3>
+        <p>An early run mangled Dubai numbers into malformed US ones. Now the country comes from the area being searched, every number is validated with Google's libphonenumber, and anything that fails is dropped instead of messaged. Landlines get flagged, since they aren't on WhatsApp.</p>
+      </div>
+      <div class="decision">
+        <h3>Manual by design</h3>
+        <p>Automated WhatsApp outreach gets numbers banned, and nobody wants a bot in their inbox. Sending stays a human click.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap rise">
+    <h2>Testing</h2>
+    <p>I ran a 10-round adversarial bug hunt with AI agents attacking the code, then re-verified every reported issue by hand, because a hunt that grades its own homework mostly produces confident noise. Twenty real findings survived and all twenty are fixed, including a cross-site scripting hole in the queue page, spreadsheet formula injection in exports, and a do-not-contact list that silently failed for phone numbers.</p>
+  </section>
+
+  <section class="wrap rise">
+    <h2>Screenshots</h2>
+    <div class="gallery">
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-1.webp" width="1600" height="1000" alt="The four stages, with counts at each step." loading="lazy" decoding="async"></div>
+        <figcaption>The four stages, with counts at each step.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-2.webp" width="1600" height="1000" alt="Every lead scored, with a plain-English reason." loading="lazy" decoding="async"></div>
+        <figcaption>Every lead scored, with a plain-English reason.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-3.webp" width="1600" height="1000" alt="What the audit found, and the message written from it." loading="lazy" decoding="async"></div>
+        <figcaption>What the audit found, and the message written from it.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-4.webp" width="1600" height="1000" alt="Drafts stay editable before anything is sent." loading="lazy" decoding="async"></div>
+        <figcaption>Drafts stay editable before anything is sent.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-5.webp" width="1600" height="1000" alt="The WhatsApp queue. One click opens the chat, I press send." loading="lazy" decoding="async"></div>
+        <figcaption>The WhatsApp queue. One click opens the chat, I press send.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-6.webp" width="1600" height="1000" alt="It's a command-line tool first. The interface is optional." loading="lazy" decoding="async"></div>
+        <figcaption>It's a command-line tool first. The interface is optional.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><img src="img/prospector/shot-7.webp" width="1600" height="1000" alt="Every check that ran, recorded." loading="lazy" decoding="async"></div>
+        <figcaption>Every check that ran, recorded.</figcaption>
+      </figure>
+    </div>
+    <p class="disclosure">Screenshots use demo data. The businesses and phone numbers are fictional.</p>
+  </section>
+
+  <section class="wrap rise">
+    <div class="closing">
+      <p>Free and MIT licensed. Use it yourself.</p>
+      <a class="btn" href="https://github.com/reh8n/prospector" target="_blank" rel="noopener noreferrer">
+        View on GitHub
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9 9 3M4.2 3H9v4.8"/></svg>
+      </a>
+    </div>
+  </section>
+</main>
+
+<footer class="section-footer">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="foot-col">
+        <h4>Main</h4>
+        <ul><li><a href="index.html#work">Work</a></li><li><a href="index.html#info">Info</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:Rehan.mali149@gmail.com">Email</a></li>
+          <li><a href="https://www.linkedin.com/in/rehan-ali-1b15353a6/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+          <li><a href="https://github.com/reh8n" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer-fine">© 2026 Rehan Ali. All rights reserved.<br>Built in Dubai, between lessons.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var rises = document.querySelectorAll('.rise');
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      rises.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.06 });
+    rises.forEach(function (el) { io.observe(el); });
+  })();
+</script>
