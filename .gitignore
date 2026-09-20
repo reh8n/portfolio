@@ -2,3 +2,6 @@
 ._*
 .netlify/
 node_modules/
+
+# build output, regenerate with tools/build-artifact.py
+dist/

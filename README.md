@@ -6,6 +6,7 @@ Personal portfolio. Self-contained HTML pages: no build step, no dependencies, n
 | --- | --- |
 | `index.html` | The home page: hero, project cards, experience, footer |
 | `prospector.html` | Case study page for Prospector |
+| `tools/build-artifact.py` | Builds a single-file copy for publishing as a Claude Artifact |
 | `img/` | Project screenshots, served as WebP |
 | `og.png` | 1200×630 link-preview image for LinkedIn, WhatsApp, iMessage |
 | `netlify.toml` | Security headers, caching rules, `/index.html` → `/` redirect |
@@ -40,6 +41,18 @@ Then give the card its own colour wash. In the CSS, near the other `.c-*` rules,
 and reference it as `<div class="project-card-colour c-yourproject"></div>`.
 
 Cards are a fixed 588px tall on desktop and grow to fit on mobile, so keep the mock compact: roughly five rows of content is the ceiling.
+
+## Publishing a preview
+
+An artifact publish carries exactly one HTML file, so relative images and page links break in it. Rebuild the single-file copy first:
+
+```bash
+python3 tools/build-artifact.py
+```
+
+It writes `dist/artifact.html` with every image inlined as a data URI, `loading="lazy"` stripped (pointless once the bytes are in the document, and some renderers never fire it), and internal page links repointed at the live site. Production files are untouched. Re-run it after changing any image or adding a page.
+
+`dist/` is ignored by git; it is a build output, not source.
 
 ## Case study pages
 
